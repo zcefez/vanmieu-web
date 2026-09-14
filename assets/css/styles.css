@@ -1,0 +1,441 @@
+@font-face {
+  font-family: "Be Vietnam Pro";
+  src: url("../fonts/BeVietnamPro-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Be Vietnam Pro";
+  src: url("../fonts/BeVietnamPro-SemiBold.ttf") format("truetype");
+  font-weight: 600 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; font-family: "Be Vietnam Pro", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+  }
+  h1, h2, h3, h4 {
+    margin: 0 0 0.5em 0;
+  }
+  p {
+    margin: 0 0 1em 0;
+    line-height: 1.5;
+  }
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    background: #2a5d84;
+    color: white;
+    padding: 0.6em 1.2em;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+  button:hover, button:focus {
+    background: #1f4560;
+    outline: none;
+  }
+  /* Container */
+  #app {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Header */
+  header {
+    background: #2a5d84;
+    color: white;
+    padding: 1em 1.5em;
+    text-align: center;
+  }
+  /* Navigation bar */
+  nav {
+    background: #1f4560;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    padding: 0.5em 1em;
+  }
+  nav button {
+    background: #3a7bbf;
+    font-weight: 600;
+  }
+  nav button.active {
+    background: #f0a500;
+    color: #222;
+  }
+  /* Main content area */
+  main {
+    flex-grow: 1;
+    padding: 1em 1.5em;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  /* Virtual Museum Hall (Sảnh bảo tàng) */
+  #hall {
+    position: relative;
+    min-height: clamp(560px, calc(100vh - 104px), 900px);
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(2rem, 5vw, 5rem) clamp(1rem, 4vw, 4rem);
+    isolation: isolate;
+    background: #14110f;
+  }
+  #hall::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+      linear-gradient(180deg, rgba(10,8,6,.18), rgba(10,8,6,.34)),
+      radial-gradient(circle at 50% 46%, rgba(255,218,155,.14), transparent 58%);
+    pointer-events: none;
+  }
+  .hall-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+  }
+  .hall-door-grid {
+    position: relative;
+    z-index: 2;
+    width: min(1480px, 100%);
+    display: grid;
+    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    align-items: end;
+    gap: clamp(.7rem, 1.8vw, 2rem);
+  }
+  .door {
+    appearance: none;
+    -webkit-appearance: none;
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    height: clamp(260px, 42vw, 470px);
+    padding: 0;
+    border: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255,255,255,.045);
+    box-shadow: 0 18px 42px rgba(0,0,0,.34);
+    transition: transform .35s ease, box-shadow .35s ease, filter .35s ease;
+  }
+  .door img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 12px 16px rgba(0,0,0,.25));
+    transition: transform .35s ease, filter .35s ease;
+  }
+  .door:hover, .door:focus-visible {
+    transform: translateY(-10px) scale(1.025);
+    box-shadow: 0 24px 58px rgba(0,0,0,.46), 0 0 0 3px rgba(240,165,0,.78);
+    outline: none;
+  }
+  .door:hover img, .door:focus-visible img {
+    transform: scale(1.045);
+    filter: drop-shadow(0 16px 20px rgba(0,0,0,.35)) brightness(1.08);
+  }
+  .door:nth-child(4), .door:nth-child(5) {
+    background: rgba(255,255,255,.08);
+  }
+  @media (max-width: 1050px) {
+    #hall { min-height: auto; }
+    .hall-door-grid {
+      grid-template-columns: repeat(3, minmax(170px, 1fr));
+      align-items: stretch;
+    }
+    .door { height: 360px; }
+  }
+  @media (max-width: 700px) {
+    #hall { padding: 1.5rem 1rem 2.5rem; }
+    .hall-door-grid { grid-template-columns: repeat(2, minmax(135px, 1fr)); gap: .8rem; }
+    .door { height: 290px; border-radius: 14px; }
+  }
+  @media (max-width: 420px) {
+    .hall-door-grid { grid-template-columns: 1fr; max-width: 270px; }
+    .door { height: 330px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .door, .door img { transition: none; }
+  }
+  /* Exhibition rooms */
+  section.room {
+    display: none;
+    animation: fadeIn 0.6s ease forwards;
+  }
+  section.room.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(10px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+  /* Back to hall button */
+  #backToHall {
+    margin: 1em 0 2em 0;
+    background: #f0a500;
+    color: #222;
+    font-weight: 700;
+  }
+  #backToHall:hover, #backToHall:focus {
+    background: #d18e00;
+  }
+  /* Scrollable timeline for Room 1 */
+  .timeline {
+    border-left: 3px solid #2a5d84;
+    margin-left: 1em;
+    padding-left: 1em;
+  }
+  .timeline-item {
+    margin-bottom: 1.2em;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: "";
+    position: absolute;
+    left: -12px;
+    top: 5px;
+    width: 12px;
+    height: 12px;
+    background: #2a5d84;
+    border-radius: 50%;
+  }
+  /* Room 2: Bia Tiến sĩ */
+  .artifact-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1em;
+  }
+  .artifact-container img {
+    max-width: 100%;
+    max-height: 320px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: zoom-in;
+    transition: transform 0.3s ease;
+    object-fit: cover;
+  }
+  .artifact-container img:focus {
+    outline: 3px solid #f0a500;
+    outline-offset: 4px;
+  }
+  .artifact-container img.zoomed {
+    cursor: zoom-out;
+    transform: scale(2);
+    z-index: 10;
+    position: relative;
+  }
+  /* Room 3: Danh nhân tiêu biểu */
+  .cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: center;
+  }
+  .card {
+    background: white;
+    border-radius: 10px;
+    width: 260px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    perspective: 1000px;
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    cursor: pointer;
+    border-radius: 10px;
+  }
+  .card:focus-within .card-inner,
+  .card-inner.flipped {
+    transform: rotateY(180deg);
+  }
+  .card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    padding: 1em;
+    box-sizing: border-box;
+  }
+  .card-front {
+    background: #2a5d84;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .card-front h3 {
+    margin-bottom: 0.3em;
+  }
+  .card-back {
+    background: #f0a500;
+    color: #222;
+    transform: rotateY(180deg);
+    overflow-y: auto;
+  }
+  /* Room 4: Truyền thống khoa bảng */
+  .tradition-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
+    gap: 1.2em;
+  }
+  .tradition-block {
+    background: white;
+    border-radius: 10px;
+    padding: 1em;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    font-weight: 600;
+    color: #1f3a72;
+  }
+  /* Room 5: Kiến trúc & nghệ thuật */
+  .architecture-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: center;
+  }
+  .architecture-card {
+    background: white;
+    border-radius: 10px;
+    width: 220px;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .architecture-card:hover, .architecture-card:focus {
+    transform: scale(1.05);
+    outline: none;
+  }
+  .architecture-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+  }
+  .architecture-card .card-info {
+    padding: 0.8em 1em;
+    color: #222;
+  }
+  /* Room 6: Từ truyền thống đến tương lai */
+  .message-circles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2em;
+    justify-content: center;
+  }
+  .message-circle {
+    background: #2a5d84;
+    color: white;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 1em;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    user-select: none;
+    transition: background-color 0.3s ease;
+  }
+  .message-circle:hover, .message-circle:focus {
+    background-color: #f0a500;
+    color: #222;
+    outline: none;
+  }
+  /* Modal for detailed messages */
+  #modalOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  #modalOverlay.active {
+    display: flex;
+  }
+  #modalContent {
+    background: white;
+    border-radius: 12px;
+    max-width: 480px;
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 1.5em 2em;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    position: relative;
+  }
+  #modalContent h3 {
+    margin-top: 0;
+  }
+  #modalCloseBtn {
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    font-weight: 700;
+    cursor: pointer;
+    color: #555;
+  }
+  #modalCloseBtn:hover, #modalCloseBtn:focus {
+    color: #222;
+    outline: none;
+  }
+  /* Responsive */
+  @media (max-width: 600px) {
+    .cards-container, .architecture-cards {
+      justify-content: center;
+    }
+    .card, .architecture-card {
+      width: 90vw;
+      max-width: 320px;
+    }
+    .message-circle {
+      width: 110px;
+      height: 110px;
+      font-size: 0.9rem;
+    }
+  }
+
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    border: 0 !important;
+  }
